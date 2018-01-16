@@ -6,7 +6,7 @@ import { Cmyk, Rgba, Hsla, Hsva } from './formats';
 export class ColorPickerService {
   private active = null;
 
-  constructor() {}
+  constructor() { }
 
   public setActive(active: any) {
     if (this.active && this.active !== active && this.active.cpDialogDisplay !== 'inline') {
@@ -143,13 +143,16 @@ export class ColorPickerService {
 
   public stringToHsva(colorString: string = '', allowHex8: boolean = false): Hsva {
     let hsva: Hsva = null;
+    if (typeof colorString === 'object') {
+      colorString = (colorString as any).target.value;
+    }
 
     colorString = (colorString || '').toLowerCase();
 
     const stringParsers = [
       {
         re: /(rgb)a?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*%?,\s*(\d{1,3})\s*%?(?:,\s*(\d+(?:\.\d+)?)\s*)?\)/,
-        parse: function(execResult: any) {
+        parse: function (execResult: any) {
           return new Rgba(parseInt(execResult[2], 10) / 255,
             parseInt(execResult[3], 10) / 255,
             parseInt(execResult[4], 10) / 255,
@@ -157,7 +160,7 @@ export class ColorPickerService {
         }
       }, {
         re: /(hsl)a?\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*(?:,\s*(\d+(?:\.\d+)?)\s*)?\)/,
-        parse: function(execResult: any) {
+        parse: function (execResult: any) {
           return new Hsla(parseInt(execResult[2], 10) / 360,
             parseInt(execResult[3], 10) / 100,
             parseInt(execResult[4], 10) / 100,
@@ -169,7 +172,7 @@ export class ColorPickerService {
     if (allowHex8) {
       stringParsers.push({
         re: /#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})?$/,
-        parse: function(execResult: any) {
+        parse: function (execResult: any) {
           return new Rgba(parseInt(execResult[1], 16) / 255,
             parseInt(execResult[2], 16) / 255,
             parseInt(execResult[3], 16) / 255,
@@ -179,21 +182,21 @@ export class ColorPickerService {
     } else {
       stringParsers.push({
         re: /#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})$/,
-        parse: function(execResult: any) {
+        parse: function (execResult: any) {
           return new Rgba(parseInt(execResult[1], 16) / 255,
             parseInt(execResult[2], 16) / 255,
             parseInt(execResult[3], 16) / 255,
             1);
         }
       }, {
-        re: /#([a-fA-F0-9])([a-fA-F0-9])([a-fA-F0-9])$/,
-        parse: function(execResult: any) {
-          return new Rgba(parseInt(execResult[1] + execResult[1], 16) / 255,
-            parseInt(execResult[2] + execResult[2], 16) / 255,
-            parseInt(execResult[3] + execResult[3], 16) / 255,
-            1);
-        }
-      });
+          re: /#([a-fA-F0-9])([a-fA-F0-9])([a-fA-F0-9])$/,
+          parse: function (execResult: any) {
+            return new Rgba(parseInt(execResult[1] + execResult[1], 16) / 255,
+              parseInt(execResult[2] + execResult[2], 16) / 255,
+              parseInt(execResult[3] + execResult[3], 16) / 255,
+              1);
+          }
+        });
     }
 
     for (const key in stringParsers) {
